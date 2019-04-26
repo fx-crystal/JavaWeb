@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>typehtml.html</title>
+
+		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+		<meta http-equiv="description" content="this is my page">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+		<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+		<link rel="stylesheet" type="text/css"
+			href="UI/themes/default/easyui.css" />
+		<link rel="stylesheet" type="text/css" href="UI/themes/icon.css" />
+		<script type="text/javascript" src="Scripts/jquery-1.8.2.min.js"
+			charset="utf-8">
+	
+</script>
+		<script type="text/javascript" src="UI/jquery.easyui.min.js"
+			charset="utf-8">
+	
+</script>
+		<script type="text/javascript" src="UI/locale/easyui-lang-zh_CN.js"
+			charset="utf-8">
+	
+</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+	$(function() {
+		//隐藏div
+		$("#tydiv").hide();
+		//查询部门
+		$("#typetb").datagrid({
+			width : 800,
+			height : 350,
+			url : 'Typeservlet?op=tyquery',
+			singleSelect : true,//不允许多选
+			pagination : true,
+			pageList : [ 10, 20, 50 ],
+			pageSize : 10,
+			columns : [ [ {
+				field : 'ck',
+				checkbox : true,
+				width : 30
+			}, {
+				field : 'id',
+				title : '编号'
+			}, {
+				field : 'dname',
+				title : '部门名称'
+			}, {
+				field : 'dtime',
+				title : '创建时间'
+			}, {
+				field : 'dcount',
+				title : '部门人数'
+			}, {
+				field : 'dtype',
+				title : '备注信息'
+			} ] ],
+			toolbar : [ {
+				text : "新增部门",
+				iconCls : "icon-add",
+				handler : function() {
+					//点击增加
+					addtype();
+				}
+			}, {
+				text : "修改部门",
+				iconCls :"icon-edit",
+				handler : function() {
+					//点击修改
+					var row = $("#typetb").datagrid('getSelected');//获取选项中的一行
+					if (row == null) {
+						$.messager.alert("提示", "请选择一行");
+					} else {
+						//修改方法
+						updtype(row);
+					}
+				}
+			}, {
+				text : "删除部门",
+				iconCls : "icon-remove",
+				handler : function() {
+					//点击删除
+					var row = $("#typetb").datagrid('getSelected');//获取选项中的一行
+					if (row == null) {
+						$.messager.alert("提示", "请选择一行");
+					} else {
+						//删除方法
+						ajaxypdel(row);
+					}
+
+				}
+			} ]
+		});
+	});
+	//点击增加
+	function addtype() {
+		//点击重置
+		$("#typeform").form("clear");
+		$("#tydiv").show();
+		$("#tydiv").dialog({
+			width : 300,
+			height : 230,
+			title : '添加部门',
+			minimizable : true, //最小化
+			maximizable : true, //最小化
+			buttons : [ {
+				text : "保存",
+				iconCls : "icon-add",
+				handler : function() {
+					//点击保存
+					ajaxypadd();
+				}
+			}, {
+				text : "重置",
+				iconCls : "icon-undo",
+				handler : function() {
+					//点击重置
+					$("#typeform").form("clear");
+				}
+			} ]
+		});
+	}
+	//点击修改
+	function updtype(row) {
+		//页面值回填
+		chongzhi(row);
+		$("#typeform").form("validate");
+		$("#tydiv").show();
+		$("#tydiv").dialog({
+			width : 300,
+			height : 230,
+			title : '修改部门',
+			minimizable : true, //最小化
+			maximizable : true, //最小化
+			buttons : [ {
+				text : "修改",
+				iconCls : "icon-edit",
+				handler : function() {
+					//点击修改
+					ajaxypupd(row);
+				}
+			}, {
+				text : "重置",
+				iconCls :"icon-undo",
+				handler : function() {
+					//点击重置
+					chongzhi(row);
+
+				}
+			} ]
+		});
+	}
+
+	//增加方法
+	function ajaxypadd() {
+		//获取页面输入值
+		var dt = $("#typeform").serializeArray();
+		console.info(dt);
+		$.ajax({
+			type : "post",
+			url : "Typeservlet?op=tyadd",
+			data : dt,
+			success : function(data) {
+				if (data == 1) {
+					$.messager.alert("提示", "增加成功");
+					$("#tydiv").dialog("close");
+					$("#typetb").datagrid("reload");
+				} else {
+					$.messager.alert("提示", "增加失败");
+				}
+			}
+		});
+	}
+	//修改方法
+	function ajaxypupd(row) {
+		var dt = $("#typeform").serializeArray();
+		console.info(dt);
+		$.ajax({
+			type : "post",
+			url : "Typeservlet?op=tyupd&tpid=" + row.id,
+			data : dt,
+			success : function(data) {
+				if (data == 1) {
+					$.messager.alert("提示", "修改成功");
+					$("#tydiv").dialog("close");
+					$("#typetb").datagrid("reload");
+				} else {
+					$.messager.alert("提示", "修改失败");
+				}
+			}
+		});
+	}
+	//修改时的重置方法
+	function chongzhi(row) {
+		$("#tpid").val(row.id);
+		$("#tyname").val(row.dname);
+		$("#tytime").datetimebox("setValue", row.dtime);
+		$("#tycot").val(row.dcount);
+		$("#tybz").val(row.dtype);
+	}
+
+	//点击删除方法
+	function ajaxypdel(row) {
+	$.ajax({
+			type : "post",
+			url : "Typeservlet?op=tydel&tpid=" + row.id,
+			success : function(data) {
+				if (data == 1) {
+					$.messager.alert("提示", "删除成功");
+					$("#typetb").datagrid("reload");
+				} else {
+					$.messager.alert("提示", "删除失败");
+				}
+
+			}
+		});
+		
+	}
+</script>
+		<table id="typetb"></table>
+		<div id="tydiv">
+			<form id="typeform">
+				<table>
+					<tr>
+						<td width="89">
+							部门名称：
+						</td>
+						<td>
+							<input type="hidden" id="tpid" name="tpid" />
+							<input type="text" name="tyname" id="tyname"
+								class="easyui-validatebox textbox" data-options="required:true" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							创建时间：
+						</td>
+						<td>
+							<input type="text" name="tytime" id="tytime"
+								data-options="required:true,showSeconds:false"
+								class="easyui-datetimebox" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							部门人数：
+						</td>
+						<td>
+							<input type="text" name="tycot" id="tycot"
+								class="easyui-validatebox textbox" data-options="required:true" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							备注信息：
+						</td>
+						<td>
+							<input type="text" name="tybz" id="tybz"
+								class="easyui-validatebox textbox" data-options="required:true" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+
+	</body>
+</html>

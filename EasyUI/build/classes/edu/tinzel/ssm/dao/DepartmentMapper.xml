@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.tinzel.ssm.dao.DepartmentMapper">
+	<!-- public List<Department> query(Map<String,Object> map ) -->
+	<select id="query" parameterType="map" resultType="Department">
+		select * from Department limit #{currentpage},#{pagerow}
+	</select>
+	<!-- public List<Department> bumen() -->
+	<select id="bumen"  resultType="Department">
+		select * from Department
+	</select>
+	<!-- public int getRowcount() -->
+	<select id="getRowcount" resultType="int" >
+		select count(*) from Department
+	</select>
+	<!-- public int addtype(Department department -->
+	<insert id="addtype" parameterType="Department">
+		insert into Department(dname,dtime,dcount,dtype) values(#{dname},#{dtime},#{dcount},#{dtype})
+	</insert>
+	
+	<!-- public int updtype(Department department) -->
+	<update id="updtype" parameterType="Department" >
+		update  Department set dname=#{dname},dtime=#{dtime},dcount=#{dcount},dtype=#{dtype} where id=#{id}
+	</update>
+	<!-- public int deltye(int id ) -->
+	<delete id="deltye"  parameterType="int">
+		delete from Department where id=#{id}
+	</delete>
+</mapper>

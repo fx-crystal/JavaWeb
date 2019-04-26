@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Emphtml.html</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="UI/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css" href="UI/themes/icon.css" />
+<script type="text/javascript" src="Scripts/jquery-1.8.2.min.js"
+	charset="utf-8">
+	
+</script>
+<script type="text/javascript" src="UI/jquery.easyui.min.js"
+	charset="utf-8">
+	
+</script>
+<script type="text/javascript" src="UI/locale/easyui-lang-zh_CN.js"
+	charset="utf-8">
+	
+</script>
+</head>
+
+<body>
+	<script type="text/javascript">
+		$(function() {
+			$("#div1").hide();//设置隐藏
+			equery();
+
+			$("#tyeach").linkbutton({
+				onClick : function() {
+					equery();
+				}
+			});
+		});
+		function equery() {
+			var yname = $("#yname").val();
+			$("#emptb").datagrid({
+				width : 800,
+				height : 350,
+				url : 'Ryservlet?op=queryemp',
+				queryParams : {
+					yname : yname
+				},
+				singleSelect : true,//不允许多选
+				//分页
+				pagination : true,
+				pageList : [ 3, 5, 10 ],
+				pageSize : 2,
+				columns : [ [ {
+					field : 'ck',
+					checkbox : true,
+					width : 30
+				}, {
+					field : 'eid',
+					title : '编号',
+					width : 100
+				}, {
+					field : 'ename',
+					title : '姓名',
+					width : 100
+				}, {
+					field : 'esex',
+					title : '性别',
+					width : 100
+				}, {
+					field : 'wenhua',
+					title : '学历',
+					width : 100
+				}, {
+					field : 'shanggang',
+					title : '时间',
+					width : 100
+				}, {
+					field : 'partment',
+					title : '部门',
+					width : 100
+				}, {
+					field : 'gongzhong',
+					title : '工种',
+					width : 100
+				} ] ],
+
+				toolbar : [ {
+					text : "新增",
+					iconCls : "icon-add",
+					handler : function() {
+						addemp();
+						//绑定下拉框
+						typequery();
+					}
+				}, {
+					text : "修改",
+					iconCls : "icon-edit",
+					handler : function() {
+
+						var row = $("#emptb").datagrid('getSelected');//获取选项中的一行
+						if (row == null) {
+							$.messager.alert("提示", "请选择一行");
+						} else {
+							//点击修改方法
+							updemp(row);
+						}
+
+					}
+				}, {
+					text : "删除",
+					iconCls : "icon-remove",
+					handler : function() {
+						//删除
+						var row = $("#emptb").datagrid('getSelected');//获取选项中的一行
+						if (row == null) {
+							$.messager.alert("提示", "请选择一行");
+						} else {
+							//点击删除方法
+							delect(row);
+						}
+					}
+				} ]
+			});
+		}
+
+		//点击新增
+		function addemp() {
+			$("#div1").show();
+			$("#addform").form("clear");//清空表单数据
+			$("#div1").dialog({
+				width : 320,
+				height : 320,
+				title : '添加员工',
+				minimizable : true, //最小化
+				maximizable : true, //最小化
+				buttons : [ {
+					text : "保存",
+					iconCls : "icon-add",
+					handler : function() {
+						ajaxadd();
+					}
+				}, {
+					text : "重置",
+					iconCls : "icon-undo",
+					handler : function() {
+						$("#addform").form("clear");
+					}
+				} ]
+			});
+		}
+		//绑定下拉框
+		function typequery() {
+			$("#types").combobox({
+				url : 'Typeservlet?op=bumen',
+				valueField : 'dname',
+				textField : 'dname'
+			});
+		}
+
+		//点击修改
+		function updemp(row) {
+			chongzhi(row);
+			// 验证表单的操作   
+			$("#addform").form("validate");
+			$("#div1").show();
+			$("#div1").dialog({
+				width : 320,
+				height : 320,
+				title : '修改员工',
+				minimizable : true, //最小化
+				maximizable : true, //最小化
+				buttons : [ {
+					text : "修改",
+					iconCls : "icon-edit",
+					handler : function() {
+						//修改方法
+						ajaxupd(row);
+					}
+				}, {
+					text : "重置",
+					iconCls : "icon-undo",
+					handler : function() {
+						//重新加载
+						chongzhi(row);
+					}
+				} ]
+			});
+		}
+
+		//修改的方法
+		function ajaxupd(row) {
+			var dt = $("#addform").serializeArray();//收集所有的name
+			$.ajax({
+				type : "post",
+				url : "Ryservlet?op=updemp",
+				data : dt,
+				success : function(data) {
+					if (data == 1) {
+						$.messager.alert("提示", "修改成功");
+						$("#div1").dialog("close");
+						$("#emptb").datagrid("reload");
+					} else {
+						$.messager.alert("提示", "修改失败");
+					}
+				}
+			});
+		}
+		//添加的方法
+		function ajaxadd() {
+			var dt = $("#addform").serializeArray();
+			$.ajax({
+				type : "post",
+				url : "Ryservlet?op=addemp",
+				data : dt,
+				success : function(data) {
+					if (data == 1) {
+						$.messager.alert("提示", "增加成功");
+						$("#div1").dialog("close");
+						$("#emptb").datagrid("reload");
+					} else {
+						$.messager.alert("提示", "增加失败");
+					}
+				}
+
+			});
+		}
+		//删除方法
+		function delect(row) {
+			$.ajax({
+				type : "post",
+				url : "Ryservlet?op=delemp&eid=" + row.eid,
+				success : function(data) {
+					if (data == 1) {
+						$.messager.alert("提示", "删除成功");
+						$("#emptb").datagrid("reload");
+					} else {
+						$.messager.alert("提示", "删除失败");
+					}
+
+				}
+			});
+
+		}
+		//值回填
+		function chongzhi(row) {
+			$("#id").val(row.eid);
+			$("#name").val(row.ename);
+			$("#sex").val(row.esex);
+			$("#types").combobox("setValue", row.partment);
+			$("#gongzhong").val(row.gongzhong);
+			$("#xueli").val(row.wenhua);
+			$("#chanjia").datetimebox("setValue", row.shanggang);
+		}
+	</script>
+	<table>
+		<tr style="height: 60px">
+			<td>员工姓名：</td>
+			<td><input class="easyui-validatebox textbox" id="yname"
+				name="yname" /></td>
+			<td><a class="easyui-linkbutton" id="tyeach"
+				data-options="iconCls:'icon-search'">查询</a></td>
+		</tr>
+	</table>
+	
+	
+	<table id="emptb"></table>
+	
+	
+	
+	<div id="div1">
+		<form id="addform" method="post">
+			<table id="t1">
+				<tr>
+					<td><input type="hidden" id="id" name="id" /></td>
+				</tr>
+				<tr>
+					<td>姓名</td>
+					<td><input type="text" id="name" name="name"
+						class="easyui-validatebox textbox" data-options="required:true" />
+					</td>
+				</tr>
+				<tr>
+					<td>性别</td>
+					<td><input type="text" id="sex" name="sex"
+						class="easyui-validatebox textbox" data-options="required:true" />
+					</td>
+				</tr>
+				<tr>
+					<td>部门</td>
+					<td><input id="types" name="types" class="easyui-combobox"
+						data-options="required:true" /></td>
+				</tr>
+				<tr>
+					<td>工种</td>
+					<td><input type="text" id="gongzhong" name="gongzhong"
+						class="easyui-validatebox textbox" data-options="required:true" />
+					</td>
+				</tr>
+				<tr>
+					<td>学历</td>
+					<td><input type="text" id="xueli" name="xueli"
+						class="easyui-validatebox textbox" data-options="required:true" />
+					</td>
+				</tr>
+				<tr>
+					<td>参加工作时间</td>
+					<td><input type="text" id="chanjia" name="chanjia"
+						data-options="required:true,showSeconds:false"
+						class="easyui-datetimebox" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>

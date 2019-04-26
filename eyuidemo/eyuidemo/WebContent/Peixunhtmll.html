@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Peixunhtmll.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+		<meta http-equiv="description" content="this is my page">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css"
+			href="UI/themes/default/easyui.css" />
+		<link rel="stylesheet" type="text/css" href="UI/themes/icon.css" />
+		<script type="text/javascript" src="Scripts/jquery-1.8.2.min.js"
+			charset="utf-8">
+</script>
+		<script type="text/javascript" src="UI/jquery.easyui.min.js"
+			charset="utf-8">
+</script>
+		<script type="text/javascript" src="UI/locale/easyui-lang-zh_CN.js"
+			charset="utf-8">
+</script>
+  </head>
+  
+  <body>
+  		<script type="text/javascript">
+	$(function() {
+		$("#px").hide();//设置隐藏
+		//查询
+		query();
+	});
+	//pid pname zhuti zhongzhi ptime didian renyuan  ptipe]
+	//查询
+	function query() {
+		$("#pxtb").datagrid({
+			width : 800,
+			height : 350,
+			url : 'Peixueservlet?op=querypx',
+			singleSelect : true,//不允许多选
+			pagination:true,
+			pageList:[10,20,50],
+			pageSize:10,
+			columns : [ [ {
+				field : 'ck',
+				checkbox : true,
+				width : 30
+			}, {
+				field : 'pid',
+				title : '编号',
+				width : 100
+			}, {
+				field : 'pname',
+				title : '培训人',
+				width : 100
+			}, {
+				field : 'zhuti',
+				title : '主题',
+				width : 100
+			}, {
+				field : 'ptime',
+				title : '培训时间',
+				width : 100
+			}, {
+				field : 'didian',
+				title : '培训地点',
+				width : 100
+			}, {
+				field : 'renyuan',
+				title : '培训人员',
+				width : 100
+			}, {
+				field : 'zongzhi',
+				title : '培训宗旨',
+				width : 100
+			}, {
+				field : 'ptipe',
+				title : '备注信息',
+				width : 100
+			} ] ],
+
+			toolbar : [ {
+				text : "新增",
+				iconCls : "icon-add",
+				handler : function() {
+					//点击增加
+					addpx();
+
+				}
+
+			}, {
+				text : "修改",
+				iconCls : "icon-edit",
+				handler : function() {
+					var row = $("#pxtb").datagrid('getSelected');//获取选项中的一行
+					if (row == null) {
+						$.messager.alert("提示", "请选择一行");
+					} else {
+						//点击修改方法
+					updpx(row);
+					}
+
+				}
+			}, {
+				text : "删除",
+				iconCls : "icon-remove",
+				handler : function() {
+					//删除
+					var row = $("#pxtb").datagrid('getSelected');//获取选项中的一行
+					if (row == null) {
+						$.messager.alert("提示", "请选择一行");
+					} else {
+						//点击删除方法
+					delpx(row);
+
+					}
+
+				}
+			} ]
+		});
+	};
+
+	//点击新增
+	function addpx() {
+		$("#px").show();
+		$("#px").dialog({
+			width : 320,
+			height : 320,
+			title : '添加员工',
+			minimizable : true, //最小化
+			maximizable : true, //最大化
+			buttons : [ {
+				text : "保存",
+				iconCls : "icon-add",
+				handler : function() {
+				//保存方法
+					ajaxadd();
+				}
+			}, {
+				text : "重置",
+				iconCls : "icon-undo",
+				handler : function() {
+				$("#pxform").form("clear");
+				}}
+			 ]
+		});
+	}
+
+	//点击修改
+	function updpx(row) {
+		$("#px").show();
+		chongzhi(row);
+		// 验证表单的操作   
+	$("#pxfrom").form("validate");
+		$("#px").dialog({
+			width : 320,
+			height : 320,
+			title : '修改员工',
+			minimizable : true, //最小化
+			maximizable : true, //最小化
+			buttons : [ {
+				text : "修改",
+				iconCls :"icon-edit",
+				handler : function() {
+					//修改方法
+					ajaxupd(row);
+				}
+			}, {
+				text : "重置",
+				iconCls :"icon-undo",
+				handler : function() {
+					//重新加载
+					chongzhi(row);
+				}
+			} ]
+		});
+	}
+
+	//修改的方法
+	function ajaxupd(row) {
+		var dt = $("#pxfrom").serializeArray();//收集所有的name
+		$.ajax({
+			type : "post",
+			url : "Peixueservlet?op=updpx&pid=" + row.pid,
+			data : dt,
+			success : function(data) {
+				if (data == 1) {
+					$.messager.alert("提示", "修改成功");
+					$("#px").dialog("close");
+					$("#pxtb").datagrid("reload");
+				} else {
+					$.messager.alert("提示", "增加失败");
+				}
+			}
+		});
+	}
+	//添加的方法
+	function ajaxadd() {
+		var dt = $("#pxfrom").serializeArray();
+		$.ajax({
+			type : "post",
+			url : "Peixueservlet?op=addpx",
+			data : dt,
+			success : function(data) {
+				if (data == 1) {
+					$.messager.alert("提示", "增加成功");
+					$("#px").dialog("close");
+					$("#pxtb").datagrid("reload");
+				} else {
+					$.messager.alert("提示", "增加失败");
+				}
+			}
+
+		});
+	}
+	//删除方法
+	function delpx(row) {
+		$.ajax({
+			type : "post",
+			url : "Peixueservlet?op=delpx&pid=" + row.pid,
+			success : function(data) {
+				if (data == 1) {
+					$.messager.alert("提示", "删除成功");
+					$("#pxtb").datagrid("reload");
+				} else {
+					$.messager.alert("提示", "删除失败");
+				}
+
+			}
+		});
+
+	}
+	//pid pname zhuti zhongzhi ptime didian renyuan  ptipe]
+	//重置
+	function chongzhi(row) {
+		$("#pxnm").val(row.pname);
+		$("#pxzt").val(row.zhuti);
+		$("#pxzz").val(row.zongzhi);
+		$("#pxtime").val(row.ptime);
+		$("#pxdd").val(row.didian);
+		$("#pxry").val(row.renyuan);
+		$("#pxxx").val(row.ptipe);
+	}
+	
+</script>
+  <table id="pxtb"></table>
+  <div id="px">
+   <form id="pxfrom">
+  <table id="pxtb">
+ 
+    <tr>
+            <td>培训人：</td>
+            <td><input type="hidden" id="pid" name="pid"/><input type="text" id="pxnm" name="pxnm" class="easyui-validatebox textbox" data-options="required:true" /></td>
+          </tr>
+          <tr>
+            <td>培训主题：</td>
+            <td><input type="text" id="pxzt" name="pxzt" class="easyui-validatebox textbox" data-options="required:true"/></td>
+          </tr>
+          <tr>
+            <td>培训宗旨：</td>
+            <td><input type="text" id="pxzz" name="pxzz" class="easyui-validatebox textbox" data-options="required:true"/></td>
+          </tr>
+          <tr>
+            <td>培训时间：</td>
+            <td><input type="text" id="pxtime" name="pxtime"data-options="required:true,showSeconds:false"
+								class="easyui-datetimebox" /></td>
+          </tr>
+          <tr>
+            <td>培训地点:</td>
+            <td><input type="text" id="pxdd" name="pxdd" class="easyui-validatebox textbox" data-options="required:true" /></td>
+          </tr>
+          <tr>
+            <td>参加人员：</td>
+            <td><input type="text" id="pxry" name="pxtry" class="easyui-validatebox textbox" data-options="required:true"/></td>
+          </tr>
+             <tr>
+            <td>备注信息：</td>
+            <td><input type="text" id="pxxx" name="pxxx" class="easyui-validatebox textbox" data-options="required:true"/></td>
+          </tr>
+          </table>
+          </form>
+          </div>
+  </body>
+</html>

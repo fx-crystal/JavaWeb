@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <display-name></display-name>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <servlet-name>Ryservlet</servlet-name>
+    <servlet-class>action.Ryservlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Typeservlet</servlet-name>
+    <servlet-class>action.Typeservlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Peixueservlet</servlet-name>
+    <servlet-class>action.Peixueservlet</servlet-class>
+  </servlet>
+
+
+
+  <servlet-mapping>
+    <servlet-name>Ryservlet</servlet-name>
+    <url-pattern>/Ryservlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Typeservlet</servlet-name>
+    <url-pattern>/Typeservlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Peixueservlet</servlet-name>
+    <url-pattern>/Peixueservlet</url-pattern>
+  </servlet-mapping>	
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

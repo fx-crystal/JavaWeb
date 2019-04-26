@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="Generator" content="EditPlus®">
+		<meta name="Author" content="">
+		<meta name="Keywords" content="">
+		<meta name="Description" content="">
+		<title>Document</title>
+		<link rel="stylesheet" type="text/css"
+			href="UI/themes/default/easyui.css" />
+		<link rel="stylesheet" type="text/css" href="UI/themes/icon.css" />
+		<link rel="stylesheet" type="text/css" href="UI/plugins/portal.css" />
+
+		<script type="text/javascript" src="Scripts/jquery-1.8.2.min.js"
+			charset="utf-8"></script>
+		<script type="text/javascript" src="UI/jquery.easyui.min.js"
+			charset="utf-8"></script>
+		<script type="text/javascript" src="UI/locale/easyui-lang-zh_CN.js"
+			charset="utf-8"></script>
+		<script type="text/javascript" src="UI/plugins/jquery.portal.js"
+			charset="utf-8"></script>
+
+
+		<script type="text/javascript">
+	//定义功能树的数据JSON
+	var datatree = [ {
+		"id" : "1",
+		"text" : "员工管理",
+		"url" : "Emphtml.html"
+	}, {
+		"id" : "2",
+		"text" : "部门管理",
+		"url" : "Typehtml.html"
+	}, {
+		"id" : "3",
+		"text" : "培训管理",
+		"url" : "Peixunhtmll.html"
+	} ];
+
+	$(function() {
+		$("#tree").tree({
+			data : datatree,
+			onClick : function(node) {
+				//console.info(node);
+				if (node.url != null) { //点击的是功能
+					var tab = $("#tabs").tabs("getTab", node.text);//根据标题查找选项卡，判断是否已经存在
+					if (tab != null) {
+						//如果存在，选中即可
+						$("#tabs").tabs("select", node.text);
+					} else {
+						//如果不存在，则在内容区增加一个tab展示功能
+						$("#tabs").tabs("add", {
+							title : node.text,
+							href : node.url, //仅仅引用的Body标签中的内容
+							closable : true
+						});
+					}
+				}
+			}
+		});
+	});
+</script>
+
+	</head>
+	<body class="easyui-layout">
+
+		<div data-options="region:'north',title:'上部区域',split:false"
+			style="height: 100px;"></div>
+		<div data-options="region:'south',title:'底部区域',split:false"
+			style="height: 100px;"></div>
+		<div data-options="region:'west',title:'功能菜单',split:true"
+			style="width: 150px;">
+
+
+			<ul id="tree"></ul>
+		</div>
+
+
+		<div data-options="region:'center',split:true">
+
+			<div id="tabs" class="easyui-tabs">
+				<div data-options="title:'欢迎来到人力资源管理系统',iconCls:'icon-ok'">
+					欢迎
+				</div>
+
+			</div>
+
+		</div>
+
+	</body>
+
+</html>
